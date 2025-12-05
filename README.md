@@ -40,8 +40,6 @@ Provee networking interno entre Pods.
 
 Validado mediante un Pod temporal (`test-pod`) con `curl` instalado.
 
-### ✔ 6. Troubleshooting real
-
 Tuve que:
 
 * reinstalar curl dentro del test-pod
@@ -49,7 +47,22 @@ Tuve que:
 * corregir un `ImagePullBackOff`
 * validar coredns en running state
 
-Todo funcionando correctamente.
+### ✔ 6. Ingress configurado y funcionando
+
+* Se creó un archivo ingress.yaml con las reglas de enrutamiento.
+* Traefik detectó y aplicó la regla para el host localhost.
+* El tráfico HTTP externo entra al clúster y llega al Service hello-service.
+
+✔ Depuración avanzada
+
+* Durante este día se resolvieron problemas relacionados con:
+* ImagePullBackOff por fallas de red.
+* Reinicio de CoreDNS.
+* Re-creación de Pods para tomar imágenes locales.
+* Validación del funcionament del Ingress con Traefik.
+
+
+¡Ingress funcionando y tráfico HTTP fluyendo correctamente! 🎉
 
 ---
 
@@ -63,7 +76,7 @@ infra/
     secret.yaml
     service.yaml
     service-clusterip.yaml
-    ingress.yaml (próximo)
+    ingress.yaml
 ```
 
 ---
@@ -74,7 +87,9 @@ infra/
 kubectl apply -f infra/k8s/configmap-html.yaml
 kubectl apply -f infra/k8s/secret.yaml
 kubectl apply -f infra/k8s/deployment.yaml
+kubectl apply -f infra/k8s/service.yaml
 kubectl apply -f infra/k8s/service-clusterip.yaml
+kubectl apply -f infra/k8s/ingress.yaml
 ```
 
 Ver Pods:
@@ -100,12 +115,9 @@ curl hello-service
 
 ---
 
-## 🔮 Siguiente paso: Día 6
+## 🔮 Siguiente paso: Día 7
 
-Implementar **Ingress** para exponer la aplicación vía Traefik en:
-
-> [http://localhost](http://localhost)
-
+Avanzar en este proyecto
 ---
 
 ## 🖋️ Firma
