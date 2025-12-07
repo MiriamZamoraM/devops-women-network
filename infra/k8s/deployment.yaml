@@ -57,6 +57,21 @@ spec:
           volumeMounts:
             - name: html-volume
               mountPath: /usr/share/nginx/html
+
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 3
+            periodSeconds: 5
+
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            
       volumes:
         - name: html-volume
           configMap:

@@ -53,7 +53,7 @@ Tuve que:
 * Traefik detectó y aplicó la regla para el host localhost.
 * El tráfico HTTP externo entra al clúster y llega al Service hello-service.
 
-✔ Depuración avanzada
+Depuración avanzada
 
 * Durante este día se resolvieron problemas relacionados con:
 * ImagePullBackOff por fallas de red.
@@ -63,6 +63,74 @@ Tuve que:
 
 
 ¡Ingress funcionando y tráfico HTTP fluyendo correctamente! 🎉
+
+### ✔ 7. Reconstrucción completa del clúster
+
+Durante este día el clúster presentó fallas críticas:
+
+ImagePullBackOff incluso para imágenes pequeñas
+
+Pod de pruebas (dns-check) también fallaba
+
+Fallas de DNS interno
+
+Traefik no podía enrutar al Service porque no existían endpoints saludables
+
+La causa: k3d perdió conectividad externa y DNS interno se corrompió, por lo cual el cluster no podía descargar imágenes ni resolver dominios.
+
+#### Solución implementada
+
+Se recreó el clúster desde cero:
+
+k3d cluster delete dev
+k3d cluster create dev --servers 1 --agents 0 --port "80:80@loadbalancer"
+
+
+Después se verificó conectividad con:
+
+kubectl run dns-check --image=alpine --restart=Never -- sh -c "apk add bind-tools >/dev/null && nslookup google.com"
+
+Una vez confirmado el acceso a Internet, se aplicó nuevamente toda la infraestructura:
+
+
+####  Cómo desplegar todo hasta ahora
+```
+kubectl apply -f infra/k8s/configmap-html.yaml
+kubectl apply -f infra/k8s/secret.yaml
+kubectl apply -f infra/k8s/deployment.yaml
+kubectl apply -f infra/k8s/service.yaml
+kubectl apply -f infra/k8s/service-clusterip.yaml
+kubectl apply -f infra/k8s/ingress.yaml
+```
+---
+Ver Pods:
+
+```
+kubectl get pods
+```
+---
+Ver Service:
+
+```
+kubectl get svc
+```
+---
+Probar DNS interno con test-pod:
+
+```
+kubectl run test-pod --image=alpine -- sleep 999999
+kubectl exec -it test-pod -- sh
+apk add curl
+curl hello-service
+```
+---
+Resultado
+
+* Pod del Deployment en estado Running
+* DNS interno de Kubernetes funcionando
+* CoreDNS operativo
+* Ingress de Traefik nuevamente accesible en http://localhost
+* Endpoints del Service correctos y en estado Ready
 
 ---
 
@@ -78,49 +146,17 @@ infra/
     service-clusterip.yaml
     ingress.yaml
 ```
-
 ---
 
-##  Cómo desplegar todo hasta ahora
-
-```
-kubectl apply -f infra/k8s/configmap-html.yaml
-kubectl apply -f infra/k8s/secret.yaml
-kubectl apply -f infra/k8s/deployment.yaml
-kubectl apply -f infra/k8s/service.yaml
-kubectl apply -f infra/k8s/service-clusterip.yaml
-kubectl apply -f infra/k8s/ingress.yaml
-```
-
-Ver Pods:
-
-```
-kubectl get pods
-```
-
-Ver Service:
-
-```
-kubectl get svc
-```
-
-Probar DNS interno con test-pod:
-
-```
-kubectl run test-pod --image=alpine -- sleep 999999
-kubectl exec -it test-pod -- sh
-apk add curl
-curl hello-service
-```
-
----
-
-## 🔮 Siguiente paso: Día 7
+## 🔮 Siguiente paso: Día 8
 
 Avanzar en este proyecto
+
+
 ---
 
-## 🖋️ Firma
-**🍀— Miriam Zamora · Backend & DevOps in Progress 🍀**  
-*Code. Ship. Repeat.*  
-*Building systems that don’t break.*
+<p align="center">
+  <strong>🍀 Miriam Zamora · Backend & DevOps in Progress 🍀</strong><br/>
+  <em>Code. Ship. Repeat.</em><br/>
+  <em>Building systems that don’t break.</em>
+</p>
