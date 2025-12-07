@@ -66,15 +66,12 @@ Depuración avanzada
 
 ### ✔ 7. Reconstrucción completa del clúster
 
-Durante este día el clúster presentó fallas críticas:
+* Durante este día el clúster presentó fallas críticas:
+* ImagePullBackOff incluso para imágenes pequeñas
+* Pod de pruebas (dns-check) también fallaba
+* Fallas de DNS interno
+* Traefik no podía enrutar al Service porque no existían endpoints saludables
 
-ImagePullBackOff incluso para imágenes pequeñas
-
-Pod de pruebas (dns-check) también fallaba
-
-Fallas de DNS interno
-
-Traefik no podía enrutar al Service porque no existían endpoints saludables
 
 La causa: k3d perdió conectividad externa y DNS interno se corrompió, por lo cual el cluster no podía descargar imágenes ni resolver dominios.
 
@@ -82,15 +79,15 @@ La causa: k3d perdió conectividad externa y DNS interno se corrompió, por lo c
 
 Se recreó el clúster desde cero:
 
-k3d cluster delete dev
-k3d cluster create dev --servers 1 --agents 0 --port "80:80@loadbalancer"
+- k3d cluster delete dev
+- k3d cluster create dev --servers 1 --agents 0 --port "80:80@loadbalancer"
 
 
 Después se verificó conectividad con:
 
-kubectl run dns-check --image=alpine --restart=Never -- sh -c "apk add bind-tools >/dev/null && nslookup google.com"
+- kubectl run dns-check --image=alpine --restart=Never -- sh -c "apk add bind-tools >/dev/null && nslookup google.com"
 
-Una vez confirmado el acceso a Internet, se aplicó nuevamente toda la infraestructura:
+Una vez confirmado el acceso a Internet, se aplicó nuevamente toda la infraestructura
 
 
 ####  Cómo desplegar todo hasta ahora
