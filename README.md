@@ -145,9 +145,61 @@ infra/
 ```
 ---
 
-## 🔮 Siguiente paso: Día 8
+### ✔ 8. Lectura de Logs para saber si hay errores (Del ruido a lo real)
 
-Avanzar en este proyecto
+###### En caso de tener problemas con el cluster, pods, y manifiestos, elimanos y volvemos a crear el cluster y aplicamos los manifiestos que hasta aquí llevamos 🤓
+
+Desde mi deployment actual:
+
+```
+kubectl logs deployment/hello-deployment
+```
+---
+
+Vayamos a lo importante, leer accesos:
+
+```
+kubectl logs deployment/hello-deployment --tail=50
+```
+---
+
+Escalemos el deployment, listamos los pods y vemos los logs de alguno de ellos:
+
+```
+kubectl scale deployment hello-deployment --replicas=2
+kubectl get pods
+kubectl logs hello-deployment-c58964-46283
+```
+---
+
+Verifiquemos con Traefik los logs de ingress:
+
+```
+kubectl logs -n kube-system deployment/traefik
+```
+---
+
+Veamos las metricas del cluster:
+
+```
+kubectl top nodes
+kubectl top pods
+```
+---
+
+Borremos uno o los pods que tengamos, esto dependerá de la necesidad y para el aprendizaje:
+
+```
+kubectl delete pod -l app=hello
+```
+
+## 🔮 Siguiente paso: Día 9
+
+Gestión correcta de configuraciones por entorno:
+
+- ConfigMap vs Secret
+- Override por entorno
+- Errores comunes en producción
 
 
 ---
